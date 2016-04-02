@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Live Chat</title>
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Droid+Sans:400,700">   
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  </head>
+  
+  <body>
+
+  	<div id="login">
+  		<h2 class="title">tell others who you are</h2>
+		  <input class="username-input" type="text" maxlength="14" />
+  	</div>
+
+  	<div id="choose-topic">
+  		<h2 class="title">Choose or create a topic</h2>
+  		<div class="topics-area">
+  			<div class="topic">
+  				<h4>Java is the best</h4>
+  				<i class="fa fa-chevron-right"></i>
+  			</div>
+  			<div class="topic">
+  				<h4>C++/C is the best</h4>
+  				<i class="fa fa-chevron-right"></i>
+  			</div>
+  			<div class="topic">
+  				<h4>Python is the best</h4>
+  				<i class="fa fa-chevron-right"></i>
+  			</div>
+  			<div class="topic">
+  				<h4>PHP is the best</h4>
+  				<i class="fa fa-chevron-right"></i>
+  			</div>
+  			<div class="topic">
+  				<h4>JavaScript is the best</h4>
+  				<i class="fa fa-chevron-right"></i>
+  			</div>
+  		</div>
+  		<input class="topic-name-input" type="text" maxlength="40"/>
+  	</div>
+
+	<div id="live-chat">
+		
+		<header>
+			<i class="fa fa-chevron-left"></i>
+			<h4>Java is the best</h4>
+		</header>
+
+		<div class="chat">
+
+			<div class="chat-history">	
+
+				<div class="chat-message">						
+					<h5 class="chat-time">Yesterday</h5>
+					<h5>Jikai Yin</h5>
+					<p>C++/C is the best programming language.</p>
+				</div> <!-- end chat-message -->
+
+				<hr>
+
+				<div class="chat-message">
+					<h5 class="chat-time">13:17</h5>
+					<h5>Guido van Rossum</h5>
+					<p>Over six years ago, in December 1989, I was looking for a "hobby" programming project that would keep me occupied during the week around Christmas. My office ... would be closed, but I had a home computer, and not much else on my hands.</p>
+				</div> <!-- end chat-message -->
+
+				<hr>
+
+				<div class="chat-message">					
+					<h5 class="chat-time">13:38</h5>
+					<h5>Mark Zuckerberg</h5>
+					<p>I remember really vividly, you know, having pizza with my friends a day or two after—I opened up the first version of Facebook at the time I thought, "You know, someone needs to build a service like this for the world." But I just never thought that we'd be the ones to help do it. And I think a lot of what it comes down to is we just cared more.</p>
+				</div> <!-- end chat-message -->
+
+				<hr>
+
+			</div>
+
+			<p class="chat-feedback">Your partner is typing…</p>
+
+			
+			<input type="text" placeholder="Type your message…" autofocus>
+
+
+		</div> <!-- end chat -->
+
+	</div> <!-- end live-chat -->
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+	<script src="js/main.js"></script> 
+  </body>
+</html>
