@@ -12,7 +12,7 @@
 
   	<div id="login">
   		<h2 class="title">tell others who you are</h2>
-		  <input class="username-input" type="text" maxlength="14" />
+		  <input class="username-input" type="text" maxlength="14" autofocus >
   	</div>
 
   	<div id="choose-topic">
@@ -39,7 +39,7 @@
   				<i class="fa fa-chevron-right"></i>
   			</div>
   		</div>
-  		<input class="topic-name-input" type="text" maxlength="40"/>
+  		<input class="topic-name-input" type="text" maxlength="40" autofocus >
   	</div>
 
 	<div id="live-chat">
@@ -90,6 +90,7 @@
 	</div> <!-- end live-chat -->
 
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
 	<script src="js/main.js"></script> 
   </body>
 </html>

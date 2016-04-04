@@ -16,6 +16,19 @@ app.use(express.static(__dirname + '/public'));
 var users = {};
 var rooms = {};
 
+// set up default room
+function setup_default_room(){
+  var list = ['Java is the best', 'C++/C is the best', 'Python is the best', 'PHP is the best', 'JavaScript is the best'];
+  for (var i =0, size = list.length; i < size; i++){
+    console.log(list[i]);
+    rooms[list[i]] = { room: list[i], users : { admin : 'admin' } };
+  }
+  console.log(rooms)
+} 
+
+setup_default_room();
+
+
 io.on('connection', function(socket){
   console.log('socket connected :: ' + socket.id);
 
@@ -32,14 +45,13 @@ io.on('connection', function(socket){
     rooms[room].users[socket.user] = socket.user;
     users[socket.user].room = room;
     
-    io.emit('update room', {
-        users: users;
-        rooms: rooms;
+    io.emit('update_room', {
+        users: users,
+        rooms: rooms
     });
 
-    console.log('user ' + socket.user + ' join room' + socket.room);
-    console.log(rooms[room]);
-    console.log(users[user]);
+    console.log('user ' + socket.user + ' join room ' + socket.room);
+    console.log(rooms);
   });
 
   socket.on('user_create_room', function(room){
@@ -48,32 +60,34 @@ io.on('connection', function(socket){
     rooms[room].users[socket.user] = socket.user;
     users[socket.user].room = room;
     
-    io.emit('update room', {
-        users: users;
-        rooms: rooms;
+    io.emit('update_room', {
+        users: users,
+        rooms: rooms
     });
 
-    console.log('user ' + socket.user + ' create and join room' + socket.room);
-    console.log(rooms[room]);
-    console.log(users[user]);
+    io.emit('append_room', room);
+    console.log("I just trigger append");
+
+    console.log('user ' + socket.user + ' create and join room ' + socket.room);
+    console.log(rooms);
   });
 
-  socket.on('user_leave_room', function(room)){
+  socket.on('user_leave_room', function(room) {
     delete socket.room;
     delete rooms[room].users[socket.user];
     delete users[socket.user].room;
-    if(Object.keys(rooms[room].users).lenght ===0 ){
+    if(Object.keys(rooms[room].users).length ===0 ){
       delete rooms[room];
+      console.log( "room " + room + " has been deleted")
     }
 
-    io.emit('update room', {
-        users: users;
-        rooms: rooms;
+    io.emit('update_room', {
+        users: users,
+        rooms: rooms
     });
 
-    console.log('user ' + socket.user + ' leave room' + socket.room);
-    console.log(rooms[room]);
-    console.log(users[user]);
+    console.log('user ' + socket.user + ' leave room ' + room);
+    console.log(rooms);
 
   });
   
