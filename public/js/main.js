@@ -4,7 +4,8 @@ $(function(){
   var user_set = false;
   var room;
   var room_set = false;
-  var room_choose = false;
+  var message;
+
 
   var socket = io();
 
@@ -15,8 +16,8 @@ $(function(){
 
 
   var $username_input = $('#login .username-input');
-  var $room_choose =  $('#choose-topic .topic');
-  var $room_add = $('#choose-topic .topic-name-input');
+  var $room_add_input = $('#choose-topic .topic-name-input');
+  var $message_input = $('#live-chat input');
 
   function user_connect () {
     socket.emit('user connect', user);
@@ -38,6 +39,14 @@ $(function(){
     socket.emit('user_leave_room', room);
   }
   
+  function user_send_message() {
+    if( user && room && message ){
+      var date = new Date();
+      var hour = date.getHours();
+      var mins = date.getMinutes();
+      socket.emit('user_send_message', message, hour, mins);
+    }
+  }
   // client response on socket
   
 
@@ -58,13 +67,21 @@ $(function(){
     }
   });
 
+  socket.on('new_message', function(message, hour, mins, message_user){
+    console.log("client receive message::"+message);
+    
+    var new_message_ele = '<div class="chat-message"><h5 class="chat-time">'+hour+':'+mins+'</h5><h5>'+message_user+'</h5><p>'+message+'</p></div>';
+    $('#live-chat .chat-history').append(new_message_ele);
+  });
+
+
   function set_user_name() {
     user = $username_input.val().trim();
     if (user != '') {
       $login_page.hide();
       get_rooms();
       $topic_choose_page.show();
-      $room_add.focus();
+      $room_add_input.focus();
       user_connect();
       user_set = true;
     }
@@ -80,19 +97,25 @@ $(function(){
     }
   }
 
-  function add_room() {
-    room = $room_add.val().trim();
-    if (room!= ''){
+  function create_room() {
+    room = $room_add_input.val().trim();
+    if( room!= '' ){
       $topic_choose_page.hide();
       $('#live-chat header h4').text(room);
       $chat_page.show();
       user_create_room();
       room_set = true;
-      $room_add.val('');
+      $room_add_input.val('');
     }
   }
 
-
+  function send_message_to_room(){
+    message = $message_input.val().trim();
+    if( message!= '' ){
+      user_send_message();
+      $message_input.val(' ');
+    }
+  }
 
   //view control part
   $topic_choose_page.hide();
@@ -104,8 +127,9 @@ $(function(){
       if (!user_set){
         set_user_name();
       } else if (user_set && !room_set ){
-        add_room();
-        console.log(room);
+        create_room();
+      } else if (user_set && room_set) {
+        send_message_to_room();
       }
     }
   });
@@ -123,7 +147,7 @@ $(function(){
     $chat_page.hide();
     get_rooms();
     $topic_choose_page.show();
-    $room_add.focus();
+    $room_add_input.focus();
     room_set = false;
     user_leave_room();
   })
