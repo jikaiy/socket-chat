@@ -60,13 +60,12 @@ io.on('connection', function(socket){
     rooms[room].users[socket.user] = socket.user;
     users[socket.user].room = room;
     
+    socket.send(rooms);
+    
     io.emit('update_room', {
         users: users,
         rooms: rooms
     });
-
-    io.emit('append_room', room);
-    console.log("I just trigger append");
 
     console.log('user ' + socket.user + ' create and join room ' + socket.room);
     console.log(rooms);
@@ -80,6 +79,7 @@ io.on('connection', function(socket){
       delete rooms[room];
       console.log( "room " + room + " has been deleted")
     }
+    socket.send(rooms);
 
     io.emit('update_room', {
         users: users,
@@ -89,6 +89,11 @@ io.on('connection', function(socket){
     console.log('user ' + socket.user + ' leave room ' + room);
     console.log(rooms);
 
+  });
+
+  socket.on('request_rooms_info', function(){
+    console.log('client request rooms info');
+    socket.send(rooms);
   });
   
   socket.on('disconnect', function(){

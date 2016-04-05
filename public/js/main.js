@@ -39,17 +39,30 @@ $(function(){
   }
   
   // client response on socket
-  socket.on('append_room', function(room){
-    console.log("I am going to append something");
-    var $new_topic = '<div class="topic"><h4>' + room +'</h4><i class="fa fa-chevron-right"></i></div>';
-    $('#choose-topic .topics-area').append($new_topic);
-  })
+  
 
   //logic control part
+
+
+  function get_rooms() {
+    socket.emit('request_rooms_info');
+    
+  }
+
+  socket.on('message', function(rooms){
+    $('#choose-topic .topics-area .topic').remove();
+    console.log("got rooms info from server");
+    for ( var new_room in rooms){
+      var new_room_ele = '<div class="topic"><h4>' + new_room +'</h4><i class="fa fa-chevron-right"></i></div>';
+      $('#choose-topic .topics-area').append(new_room_ele);
+    }
+  });
+
   function set_user_name() {
     user = $username_input.val().trim();
     if (user != '') {
       $login_page.hide();
+      get_rooms();
       $topic_choose_page.show();
       $room_add.focus();
       user_connect();
@@ -80,10 +93,10 @@ $(function(){
   }
 
 
+
   //view control part
   $topic_choose_page.hide();
   $chat_page.hide();
-
 
 
   $window.keydown(function (event){
@@ -97,15 +110,18 @@ $(function(){
     }
   });
   
-  $room_choose.click(function() {
-    var index = $room_choose.index( this );
-    room = $room_choose[index].textContent.trim();
+  $('#choose-topic .topics-area').delegate('.topic','click', function() {
+    var index = $('#choose-topic .topics-area .topic').index( this );
+    console.log(index);
+    room = $('#choose-topic .topics-area .topic')[index].textContent.trim();
     set_room();
+
     console.log(room);
   });
 
   $('#live-chat header').click(function() {
     $chat_page.hide();
+    get_rooms();
     $topic_choose_page.show();
     $room_add.focus();
     room_set = false;
