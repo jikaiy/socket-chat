@@ -15,6 +15,7 @@ app.use(express.static(__dirname + '/public'));
 
 var users = {};
 var rooms = {};
+var socket_id_user_map = {}
 
 // set up default room
 function setup_default_room(){
@@ -36,6 +37,7 @@ io.on('connection', function(socket){
     //TODO check if user already exist
     socket.user = user;
     users[user] = user;
+    socket_id_user_map[user] = socket.id;
     console.log('socket bind user :: ' + socket.id + ' :: '+ user);
     console.log(users);
   });
@@ -46,6 +48,7 @@ io.on('connection', function(socket){
     users[socket.user].room = room;
     
     socket.join(socket.room);
+    io.to(socket.room).emit('user_joined', socket.user);
 
     console.log('user ' + socket.user + ' join room ' + socket.room);
     console.log(rooms);
@@ -59,6 +62,7 @@ io.on('connection', function(socket){
     
     socket.send(rooms);
     socket.join(socket.room);
+    io.to(socket.room).emit('user_joined', socket.user);
     
     console.log('user ' + socket.user + ' create and join room ' + socket.room);
     console.log(rooms);
@@ -74,6 +78,7 @@ io.on('connection', function(socket){
     }
     socket.send(rooms);
     socket.leave(socket.room);
+    io.to(socket.room).emit('user_left', socket.user);
 
     console.log('user ' + socket.user + ' leave room ' + room);
     console.log(rooms);
@@ -87,12 +92,38 @@ io.on('connection', function(socket){
 
   socket.on('user_send_message', function(message, hour, mins){
     console.log('server receive message::'+message);
-    io.to(socket.room).emit('new_message', message, hour, mins, socket.user);
+    if( message.startsWith('@') ){
+      var receiver = message.split(" ")[0].slice(1)
+      var receiver_id = socket_id_user_map[receiver]
+      console.log("send unicast message to " + receiver + "::" + receiver_id);
+      if ( receiver_id ){
+        socket.broadcast.to(socket_id_user_map[receiver]).emit('new_message', message, hour, mins, socket.user);
+      } else {
+        io.to(socket.room).emit('new_message', message, hour, mins, socket.user);
+      }
+      
+    } else {
+      io.to(socket.room).emit('new_message', message, hour, mins, socket.user);
+    }
+    
   });
   
+  socket.on('user_tying', function(){
+    console.log(socket.user + ' is typing');
+    io.to(socket.room).emit('user_tying', socket.user);
+  });
+
+  socket.on('user_stop_typing', function(){
+    console.log(socket.user + ' stop typing');
+    io.to(socket.room).emit('user_stop_typing');
+  });
+
+
   socket.on('disconnect', function(){
     console.log('socket disconnected :: ' + socket.id + ' :: ' + socket.user );
     delete users[socket.user];
   });
+
+
 
 });

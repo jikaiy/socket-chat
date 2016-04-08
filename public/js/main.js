@@ -70,10 +70,32 @@ $(function(){
   socket.on('new_message', function(message, hour, mins, message_user){
     console.log("client receive message::"+message);
     
-    var new_message_ele = '<div class="chat-message"><h5 class="chat-time">'+hour+':'+mins+'</h5><h5>'+message_user+'</h5><p>'+message+'</p></div>';
+    var new_message_ele = '<div class="chat-message"><h5 class="chat-time">'+hour+':'+mins+'</h5><h5>'+message_user+'</h5><p>'+message+'</p></div><hr>';
     $('#live-chat .chat-history').append(new_message_ele);
+    $('#live-chat .chat-history')[0].scrollTop = $('#live-chat .chat-history')[0].scrollHeight;
   });
 
+  socket.on('user_tying', function(typing_user){
+    console.log(typing_user + '  ' + socket.user + '  ' + user);
+    if(typing_user != user){
+      var new_feedback = typing_user + ' is typing';
+      $('.chat-feedback').text(new_feedback);
+    }
+  });
+
+  socket.on('user_stop_typing', function(){
+    $('.chat-feedback').text('');
+  });
+
+  socket.on('user_joined', function(joined_user){
+    if(joined_user === user){
+      $('.chat-feedback').text('Welcome! Say hey to others');
+    } else {
+      var new_feedback = joined_user + ' joined, Say hey to him/her';
+      $('.chat-feedback').text(new_feedback);
+    }
+
+  })
 
   function set_user_name() {
     user = $username_input.val().trim();
@@ -92,6 +114,7 @@ $(function(){
       $topic_choose_page.hide();
       $('#live-chat header h4').text(room);
       $chat_page.show();
+      $message_input.focus();
       user_join_room();
       room_set = true;
     }
@@ -114,8 +137,32 @@ $(function(){
     if( message!= '' ){
       user_send_message();
       $message_input.val(' ');
+      $message_input.focus();
     }
   }
+
+  var typing = false;
+  var lastTyingTime;
+
+  function update_typing() {
+    if( !typing ){
+      typing = true;
+      socket.emit('user_tying');
+    }
+    
+    lastTyingTime = (new Date()).getTime();
+
+    setTimeout( function() {
+      var typingTimer = (new Date()).getTime();
+      var timeDiff = typingTimer - lastTyingTime;
+      if( timeDiff >= 500 && typing){
+        socket.emit('user_stop_typing');
+        console.log("I am typing");
+        typing = false;
+      }
+    }, 500);
+  }
+
 
   //view control part
   $topic_choose_page.hide();
@@ -151,5 +198,9 @@ $(function(){
     room_set = false;
     user_leave_room();
   })
+
+  $message_input.on('input', function(){
+    update_typing();
+  });
 
 });
