@@ -70,6 +70,14 @@ $(function(){
   socket.on('new_message', function(message, hour, mins, message_user){
     console.log("client receive message::"+message);
     
+    if( hour < 10 ){
+      hour = '0'+hour;
+    }
+      
+    if( mins < 10 ){
+      mins = '0'+mins;
+    }
+    
     var new_message_ele = '<div class="chat-message"><h5 class="chat-time">'+hour+':'+mins+'</h5><h5>'+message_user+'</h5><p>'+message+'</p></div><hr>';
     $('#live-chat .chat-history').append(new_message_ele);
     $('#live-chat .chat-history')[0].scrollTop = $('#live-chat .chat-history')[0].scrollHeight;
